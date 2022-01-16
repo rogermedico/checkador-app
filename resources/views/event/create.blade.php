@@ -3,106 +3,56 @@
 @section('main-content')
     <div class="offset-lg-2 col-lg-8 ">
         <h1 class="serif">{{__('make reservation')}}</h1>
-        <x-messages/>
+        <x-messages :message="$message ?? null" />
         <x-errors/>
-        <form class="needs-validation" novalidate method="post" action="{{route('reservation.store.first')}}">
+        <form class="needs-validation" novalidate method="post" action="{{route('event.store')}}">
             @csrf
-            <div class="card mb-3">
+            <div class="card">
                 <div class="card-body">
-                    @guest
+                    @if(auth()->user()->isAdmin())
                         <div class="mb-3">
-                            <label class="form-label" for="name">{{ __('Name')}}</label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="name"
-                                placeholder="{{ __('John')}}"
-                                name="name"
-                                required
-                                value="{{$createReservationFirstStepInfo['name'] ?? null}}"
-                            >
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="surname">{{ __('Surname')}}</label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="surname"
-                                placeholder="{{ __('Smith')}}"
-                                name="surname"
-                                required
-                                value="{{$createReservationFirstStepInfo['surname'] ?? null}}"
-                            >
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="email">{{ __('Email')}}</label>
-                            <input
-                                type="email"
-                                class="form-control"
-                                id="email"
-                                placeholder="{{__('example@gmail.com')}}"
-                                name="email"
-                                pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$"
-                                required
-                                value="{{$createReservationFirstStepInfo['email'] ?? null}}"
-                            >
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="password">{{ __('Password')}}</label>
-                            <input
-                                type="password"
-                                class="form-control"
-                                id="password"
-                                placeholder="{{__('password')}}"
-                                name="password"
-                                minlength="8"
-                                required
-                                value="{{$createReservationFirstStepInfo['password'] ?? null}}"
-                            >
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="password_confirmation">{{ __('Confirm password')}}</label>
-                            <input
-                                type="password"
-                                class="form-control"
-                                id="password_confirmation"
-                                placeholder="{{__('password')}}"
-                                name="password_confirmation"
-                                minlength="8"
-                                required
-                                value="{{$createReservationFirstStepInfo['password'] ?? null}}"
-                            >
-                        </div>
-                    @endguest
-                    <div class="mb-3">
-                        <label class="form-label" for="session">{{__('Session')}}</label>
-                            <select class="form-select" name="session" id="session" required>
-                                <option
-                                    selected
-                                    {{!isset($createReservationFirstStepInfo) ? 'selected' : ''}}
-                                    value=""
-                                >
-                                    {{__('Select Session')}}
-                                </option>
-                                @foreach($sessions as $session)
+                            <label class="form-label" for="user_id">{{__('User')}}</label>
+                            <select class="form-select" name="user_id" id="user_id" required>
+                                @foreach(\App\Models\User::all() as $user)
                                     <option
-                                        {{
-                                            isset($createReservationFirstStepInfo) && (int) $createReservationFirstStepInfo['session'] === $session->id
-                                            ? 'selected'
-                                            : ''
-                                        }}
-                                        value="{{$session->id}}"
+                                        value="{{$user->id}}"
+                                        {{ auth()->user()->id == $user->id ? 'selected' : '' }}
                                     >
-                                        {{$session->name . ' - ' . \Carbon\Carbon::parse($session->date)->format('d/m/Y H:i')}}
+                                        {{$user->name . ' ' . $user->surname}}
                                     </option>
                                 @endforeach
                             </select>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="flex-grow-1 text-end">
-                            <button type="submit" class="btn btn-primary">{{ __('Next')}}</button>
                         </div>
+                    @else
+                        <input type="text" value="{{auth()->user()->id}}" hidden>
+                    @endif
+                    <div class="mb-3">
+                        <label class="form-label" for="event_datetime">{{ __('Datetime')}}</label>
+                        <input
+                            type="datetime-local"
+                            class="form-control"
+                            id="event_datetime"
+                            name="event_datetime"
+                            required
+                            value="{{\Carbon\Carbon::now()->format('Y-m-d H:i')}}"
+                        >
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_type">{{__('Event type')}}</label>
+                        <select class="form-select" name="event_type" id="event_type" required>
+                            <option selected value="">
+                                {{__('Select event type')}}
+                            </option>
+                            @foreach($eventTypes as $eventType)
+                                <option value="{{$eventType->id}}" >
+                                    {{$eventType->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="me-3 mb-3 text-end">
+                    <button type="submit" class="btn btn-primary">{{ __('Create event')}}</button>
                 </div>
             </div>
         </form>

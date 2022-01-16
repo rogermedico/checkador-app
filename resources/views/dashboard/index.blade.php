@@ -15,6 +15,23 @@
                         @csrf
                         <div class="card">
                             <div class="card-body">
+                                @if(auth()->user()->isAdmin())
+                                    <div class="mb-3">
+                                        <label class="form-label" for="user_id">{{__('User')}}</label>
+                                        <select class="form-select" name="user_id" id="user_id" required>
+                                            @foreach(\App\Models\User::all() as $user)
+                                                <option
+                                                    value="{{$user->id}}"
+                                                    {{ auth()->user()->id == $user->id ? 'selected' : '' }}
+                                                >
+                                                    {{$user->name . ' ' . $user->surname}}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @else
+                                    <input type="text" value="{{auth()->user()->id}}" hidden>
+                                @endif
                                 <div class="mb-3">
                                     <label class="form-label" for="event_datetime">{{ __('Datetime')}}</label>
                                     <input

@@ -24,8 +24,18 @@ class StoreEventRequest extends FormRequest
     public function rules()
     {
         return [
-            'event_datetime' => 'required|date',
-            'event_type' => 'required|exists:event_types,id',
+            'user_id' => [
+                'required',
+                'exists:users,id'
+            ],
+            'event_datetime' => [
+                'required',
+                'date'
+            ],
+            'event_type' => [
+                'required',
+                'exists:event_types,id'
+            ],
         ];
     }
 }

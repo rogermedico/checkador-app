@@ -10,6 +10,14 @@ class EventPolicy
 {
     use HandlesAuthorization;
 
+    public function before(User $user, $ability)
+    {
+        if($user->isAdmin())
+        {
+            return true;
+        }
+    }
+
     public function index(User $user)
     {
         return $user->isAdmin();
@@ -24,13 +32,9 @@ class EventPolicy
         return $user->id === $eventsUser->id;
     }
 
-    public function store(User $user, int $user_id): bool
+    public function store(User $user, Event $event): bool
     {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return $user->id === $user_id;
+        return $user->id === $event->user_id;
     }
 
     public function edit(User $user, Event $event): bool

@@ -69,63 +69,10 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('reservation.create', [
-            'sessions' => Session::all(),
-            'createReservationFirstStepInfo' => session('createReservationFirstStepInfo'),
+        return view('event.create', [
+            'eventTypes' => EventType::all()
         ]);
     }
-
-//    /**
-//     * Process the first step of the form for creating a new resource.
-//     *
-//     * @param ProcessFirstStepReservationRequest $request
-//     * @return RedirectResponse
-//     */
-//    public function processFirstStep(ProcessFirstStepReservationRequest $request): RedirectResponse
-//    {
-//        session(['createReservationFirstStepInfo' => $request->validated()]);
-//
-//        return redirect()->route('reservation.create.second');
-//    }
-//
-//    /**
-//     * Show the second step of the form for creating a new resource.
-//     *
-//     * @return Application|Factory|View
-//     */
-//    public function createSecondStep()
-//    {
-//        $createReservationFirstStepInfo = session('createReservationFirstStepInfo');
-//
-//        $occupiedSeats = array_map(function ($seat) {
-//            return $seat['row'] . '-' . $seat['column'];
-//        },
-//            Session::find($createReservationFirstStepInfo['session'])
-//                ->reservations()
-//                ->select(['row', 'column'])
-//                ->get()
-//                ->toArray()
-//        );
-//
-//        if (auth()->user()) {
-//            $userSeats = array_map(function ($seat) {
-//                return $seat['row'] . '-' . $seat['column'];
-//            },
-//                Reservation::where('session_id', $createReservationFirstStepInfo['session'])
-//                ->where('user_id', auth()->user()->id)
-//                ->select(['row', 'column'])
-//                ->get()
-//                ->toArray()
-//            );
-//
-//            $occupiedSeats = array_diff($occupiedSeats, $userSeats);
-//        }
-//
-//        return view('reservation.create-second-step', [
-//            'occupiedSeats' => $occupiedSeats,
-//            'userSeats' => $userSeats ?? []
-//        ]);
-//    }
 
     /**
      * Store a newly created resource in storage (Store second step).
@@ -135,19 +82,24 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
-        if (Gate::denies('storeasdf', $validated['user_id'] ?? auth()->user()->id)) {
-            return redirect()->route('dashboard.index');
-        }
-
         $validated = $request->validated();
 
-        Event::create([
-            'user_id' => $validated['user_id'] ?? auth()->user()->id,
+        $event = Event::make([
+            'user_id' => $validated['user_id'],
             'event_type_id' => $validated['event_type'],
             'date' => Carbon::parse($validated['event_datetime'])->toDateString(),
             'time' => Carbon::parse($validated['event_datetime'])->toTimeString(),
         ]);
 
+        $this->authorize('store', $event);
+
+//        if (Gate::denies('storeEvent', $event)) {
+//            return redirect()->route('dashboard.index');
+//        }
+
+        $event->save();
+
+//
         return redirect()->route('dashboard.index')
             ->with('message', __('Event created'));
     }

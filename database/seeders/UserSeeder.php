@@ -24,5 +24,9 @@ class UserSeeder extends Seeder
             'personal_business_days' => 3,
             'admin' => true,
         ]);
+
+        User::factory()->create([
+            'email' => 'user@gmail.com',
+        ]);
     }
 }

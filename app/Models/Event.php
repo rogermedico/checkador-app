@@ -22,6 +22,11 @@ class Event extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'event_type_id' => 'integer',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

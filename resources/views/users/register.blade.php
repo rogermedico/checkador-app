@@ -70,7 +70,7 @@
 
                 <div class="d-flex flex-row mb-3">
                     <div class="flex-grow-1 ms-3">
-                        <a class="btn btn-outline-danger" href="{{route('reservation.create')}}">{{ __('Cancel')}}</a>
+                        <a class="btn btn-outline-danger" href="{{route('user.login.show')}}">{{ __('Cancel')}}</a>
                     </div>
                     <div class="flex-grow-1 me-3 text-end">
                         <button type="submit" class="btn btn-primary">{{ __('Register')}}</button>
