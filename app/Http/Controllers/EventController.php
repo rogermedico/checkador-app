@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\event\ProcessFirstStepReservationRequest;
 use App\Http\Requests\event\ProcessSecondStepReservationRequest;
 use App\Http\Requests\event\StoreEventRequest;
-use App\Http\Requests\event\UpdateReservationRequest;
+use App\Http\Requests\event\UpdateEventRequest;
 use App\Models\Event;
 use App\Models\EventType;
 use App\Models\Reservation;
 use App\Models\Session;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -69,9 +70,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('event.create', [
-            'eventTypes' => EventType::all()
-        ]);
+        return view('event.create');
     }
 
     /**
@@ -91,15 +90,11 @@ class EventController extends Controller
             'time' => Carbon::parse($validated['event_datetime'])->toTimeString(),
         ]);
 
+        /* Since it is the EventController Class the policy has to receive an Event Model */
         $this->authorize('store', $event);
-
-//        if (Gate::denies('storeEvent', $event)) {
-//            return redirect()->route('dashboard.index');
-//        }
 
         $event->save();
 
-//
         return redirect()->route('dashboard.index')
             ->with('message', __('Event created'));
     }
@@ -107,119 +102,43 @@ class EventController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  Reservation $reservation
+     * @param Event $event
      * @return Application|Factory|View|RedirectResponse
      */
-    public function edit(Reservation $reservation)
+    public function edit(Event $event)
     {
-        if (Gate::denies('edit', $reservation)) {
-            return redirect()->route('user.reservations.show', auth()->user());
-        }
+        $this->authorize('edit', $event);
 
-        $occupiedSeats = array_map(
-            function($seat)
-            {
-                return $seat['row'] . '-' . $seat['column'];
-            },
-            Reservation::where('session_id', $reservation->session_id)
-                ->where(
-                    function($q) use($reservation)
-                    {
-                        $q->where('row', '!=', $reservation->row);
-                        $q->orWhere('column', '!=', $reservation->column);
-                    }
-                )
-                ->select(['row','column'])
-                ->get()
-                ->toArray()
-        );
-
-        $userSeats = array_map(
-            function ($seat)
-            {
-                return $seat['row'] . '-' . $seat['column'];
-            },
-            Reservation::where('session_id', $reservation->session_id)
-                ->where('user_id', $reservation->user_id)
-                ->where(
-                    function($q) use($reservation)
-                    {
-                        $q->where('row', '!=', $reservation->row);
-                        $q->orWhere('column', '!=', $reservation->column);
-                    }
-                )
-                ->select(['row', 'column'])
-                ->get()
-                ->toArray()
-        );
-
-        $occupiedSeats = array_diff($occupiedSeats, $userSeats);
-
-        return view('reservation.edit-reservation', [
-            'reservation' => $reservation,
-            'occupiedSeats' => $occupiedSeats,
-            'userSeats' => $userSeats
+        return view('event.edit', [
+            'event' => $event,
+            'user' => User::find($event->user_id)
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateReservationRequest  $request
-     * @param  Reservation  $reservation
+     * @param UpdateEventRequest $request
+     * @param Event $event
      * @return Application|Factory|View|RedirectResponse
+     * @throws AuthorizationException
      */
-    public function update(UpdateReservationRequest $request, Reservation $reservation)
+    public function update(UpdateEventRequest $request, Event $event)
     {
-        if (Gate::denies('update', $reservation)) {
-            return redirect()->route('user.reservations.show', auth()->user());
-        }
+        $this->authorize('edit', $event);
 
-        $rowColumn = explode('-', $request->validated()['newseat']);
+        $validated = $request->validated();
 
-        $session = Session::find($reservation->session_id);
-
-        Log::channel('reservations')
-            ->info(auth()->user()->name
-                . ' '
-                . auth()->user()->surname
-                . ' (id='
-                . auth()->user()->id
-                . ') changed the seat at '
-                . $reservation->row
-                . '-'
-                . $reservation->column
-                . ' for the seat at '
-                . $rowColumn[0]
-                . '-'
-                . $rowColumn[1]
-                . ' for the "'
-                . $session->name
-                . '" theater play on '
-                . Carbon::parse($session->date)->format('d/m/Y H:i')
-            );
-
-        $reservation->update([
-            'row' => $rowColumn[0],
-            'column' => $rowColumn[1]
+        $event->update([
+            'event_type_id' => $validated['event_type'],
+            'date' => Carbon::parse($validated['event_datetime'])->toDateString(),
+            'time' => Carbon::parse($validated['event_datetime'])->toTimeString(),
         ]);
 
-        $reservations = [];
-        $user = User::find($reservation->user_id);
-        foreach ($user->reservations as $reservation) {
-            $session = Session::find($reservation->session_id);
-            $reservations[$session->name][Carbon::parse($session->date)->format('d/m/Y H:i')][] = [
-                'id' => $reservation->id,
-                'row' => $reservation->row,
-                'column' => $reservation->column
-            ];
-        }
-
-        if (auth()->user()->id !== $reservation->user_id) {
-            return redirect()->route('reservation.index')->with('message', __('Reservation updated'));
+        if (auth()->user()->id !== $event->user_id) {
+            return redirect()->route('event.index')->with('message', __('Event updated'));
         } else {
-            return view('users.reservations', compact('reservations','user'))
-                ->with('message', __('Reservation updated'));
+            return back()->with('message', __('Event updated'));
         }
     }
 

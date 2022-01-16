@@ -24,13 +24,13 @@
                                                     value="{{$user->id}}"
                                                     {{ auth()->user()->id == $user->id ? 'selected' : '' }}
                                                 >
-                                                    {{$user->name . ' ' . $user->surname}}
+                                                    {{ $user->name_surname }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </div>
                                 @else
-                                    <input type="text" value="{{auth()->user()->id}}" hidden>
+                                    <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
                                 @endif
                                 <div class="mb-3">
                                     <label class="form-label" for="event_datetime">{{ __('Datetime')}}</label>
@@ -49,7 +49,7 @@
                                         <option selected value="">
                                             {{__('Select event type')}}
                                         </option>
-                                        @foreach($eventTypes as $eventType)
+                                        @foreach(\App\Models\EventType::all() as $eventType)
                                             <option value="{{$eventType->id}}" >
                                                 {{$eventType->name}}
                                             </option>

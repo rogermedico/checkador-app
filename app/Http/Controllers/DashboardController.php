@@ -11,8 +11,6 @@ class DashboardController extends Controller
     {
 
 
-        return view('dashboard.index', [
-            'eventTypes' => EventType::all()
-        ]);
+        return view('dashboard.index');
     }
 }

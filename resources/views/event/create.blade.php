@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="offset-lg-2 col-lg-8 ">
-        <h1 class="serif">{{__('make reservation')}}</h1>
+        <h1 class="serif">{{__('create event')}}</h1>
         <x-messages :message="$message ?? null" />
         <x-errors/>
         <form class="needs-validation" novalidate method="post" action="{{route('event.store')}}">
@@ -18,13 +18,13 @@
                                         value="{{$user->id}}"
                                         {{ auth()->user()->id == $user->id ? 'selected' : '' }}
                                     >
-                                        {{$user->name . ' ' . $user->surname}}
+                                        {{ $user->name_surname }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                     @else
-                        <input type="text" value="{{auth()->user()->id}}" hidden>
+                        <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
                     @endif
                     <div class="mb-3">
                         <label class="form-label" for="event_datetime">{{ __('Datetime')}}</label>
@@ -43,7 +43,7 @@
                             <option selected value="">
                                 {{__('Select event type')}}
                             </option>
-                            @foreach($eventTypes as $eventType)
+                            @foreach(\App\Models\EventType::all() as $eventType)
                                 <option value="{{$eventType->id}}" >
                                     {{$eventType->name}}
                                 </option>

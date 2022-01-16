@@ -39,10 +39,6 @@ class EventPolicy
 
     public function edit(User $user, Event $event): bool
     {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
         return $user->id === $event->user_id;
     }
 

@@ -33,6 +33,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime'
     ];
 
+    public function getNameSurnameAttribute()
+    {
+        return $this->name . ' '. $this->surname;
+    }
+
     public function isAdmin()
     {
         return $this->admin;
