@@ -23,15 +23,6 @@ class EventPolicy
         return $user->isAdmin();
     }
 
-    public function show(User $user, User $eventsUser): bool
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return $user->id === $eventsUser->id;
-    }
-
     public function store(User $user, Event $event): bool
     {
         return $user->id === $event->user_id;
@@ -44,19 +35,11 @@ class EventPolicy
 
     public function update(User $user, Event $event): bool
     {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
         return $user->id === $event->user_id;
     }
 
     public function delete(User $user, Event $event): bool
     {
-        if($user->isAdmin()) {
-            return true;
-        }
-
         return $user->id === $event->user_id;
     }
 }

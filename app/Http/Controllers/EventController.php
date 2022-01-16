@@ -24,43 +24,39 @@ use Illuminate\Support\Facades\Log;
 class EventController extends Controller
 {
     /**
-     * Constructor, apply middleware auth to specific routes
-     *
-     */
-    public function __construct()
-    {
-        $this->middleware('auth')->only([
-            'index',
-            'edit',
-            'update',
-            'destroy',
-        ]);
-    }
-
-    /**
      * Display a listing of the resource.
      *
      * @return Application|Factory|View|RedirectResponse
      */
     public function index()
     {
-        if (Gate::denies('index', auth()->user())) {
-            return redirect()->route('user.reservations.show', auth()->user());
-        }
+        $this->authorize('index', Event::class);
 
-        $reservations = [];
-        foreach (Reservation::orderBy('row')->orderBy('column')->get() as $reservation) {
-            $session = Session::find($reservation['session_id']);
-            $user = User::find($reservation->user_id);
-            $reservations[$session->name][Carbon::parse($session->date)->format('d/m/Y H:i')][] = [
-                'id' => $reservation->id,
-                'user' => $user,
-                'row' => $reservation->row,
-                'column' => $reservation->column,
-            ];
-        }
+        /**
+         * s'ha d'acabar de pensar com ha de ser aquesta pantalla
+         * en principi hi haurà un selector de dia i es mostraran
+         * tots els events del dia seleccionat amb botons per eliminar-los
+         * o editar-los.
+         */
 
-        return view('admin.reservations', compact('reservations'));
+        echo 'index';
+//        if (Gate::denies('index', auth()->user())) {
+//            return redirect()->route('user.reservations.show', auth()->user());
+//        }
+//
+//        $reservations = [];
+//        foreach (Reservation::orderBy('row')->orderBy('column')->get() as $reservation) {
+//            $session = Session::find($reservation['session_id']);
+//            $user = User::find($reservation->user_id);
+//            $reservations[$session->name][Carbon::parse($session->date)->format('d/m/Y H:i')][] = [
+//                'id' => $reservation->id,
+//                'user' => $user,
+//                'row' => $reservation->row,
+//                'column' => $reservation->column,
+//            ];
+//        }
+//
+//        return view('admin.reservations', compact('reservations'));
     }
 
     /**
@@ -145,35 +141,15 @@ class EventController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Reservation $reservation
+     * @param Event $event
      * @return RedirectResponse
      */
-    public function destroy(Reservation $reservation): RedirectResponse
+    public function destroy(Event $event): RedirectResponse
     {
-        if (Gate::denies('delete', $reservation)) {
-            return redirect()->route('user.reservations.show', auth()->user());
-        }
+        $this->authorize('destroy', $event);
 
-        $session = Session::find($reservation->session_id);
+        $event->delete();
 
-        Log::channel('reservations')
-            ->info(auth()->user()->name
-                . ' '
-                . auth()->user()->surname
-                . ' (id='
-                . auth()->user()->id
-                . ') canceled the seat at '
-                . $reservation->row
-                . '-'
-                . $reservation->column
-                . ' for the "'
-                . $session->name
-                . '" theater play on '
-                . Carbon::parse($session->date)->format('d/m/Y H:i')
-            );
-
-        $reservation->delete();
-
-        return back()->with('message', __('Reservation deleted'));
+        return back()->with('message', __('Event deleted'));
     }
 }
