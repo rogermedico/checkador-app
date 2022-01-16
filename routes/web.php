@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,21 +17,22 @@ use App\Http\Controllers\ReservationController;
 |
 */
 
-/** root uri pointed to reservation.create this has to be replaced for the landing page if any */
-Route::get('/', [ReservationController::class, 'create']);
+/** dashboard routes */
+Route::get('/', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard.index');
 
-/** reservation routes */
-Route::get('reservation/create/second', [ReservationController::class, 'createSecondStep'])->name('reservation.create.second');
-Route::post('reservation/first', [ReservationController::class, 'processFirstStep'])->name('reservation.store.first');
-Route::resource('reservation', ReservationController::class)->except('show');
+/** event routes */
+//Route::get('reservation/create/second', [EventController::class, 'createSecondStep'])->name('reservation.create.second');
+//Route::post('reservation/first', [EventController::class, 'processFirstStep'])->name('reservation.store.first');
+Route::resource('event', EventController::class)->middleware('auth')->except('show');
 
 /** user routes */
 Route::get('user/login', [UserController::class, 'loginShow'])->middleware('guest')->name('user.login.show');
 Route::post('user/login', [UserController::class, 'login'])->middleware('guest')->name('user.login');
 Route::get('user/logout', [UserController::class, 'logout'])->middleware('auth')->name('user.logout');
+Route::put('user/{user}/job', [UserController::class, 'updateJob'])->middleware('auth')->name('user.update.job');
 Route::put('user/{user}/password', [UserController::class, 'updatePassword'])->middleware('auth')->name('user.update.password');
-Route::get('user/{user}/reservations', [UserController::class, 'showReservations'])->middleware('auth')->name('user.reservations.show');
+//Route::get('user/{user}/reservations', [UserController::class, 'showReservations'])->middleware('auth')->name('user.reservations.show');
 Route::resource('user', UserController::class)->except('show');
 
-/** session routes */
-Route::resource('session', SessionController::class)->except('create','show',)->middleware('admin');
+///** session routes */
+//Route::resource('session', SessionController::class)->except('create','show',)->middleware('admin');

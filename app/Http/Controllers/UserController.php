@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\user\LoginUserRequest;
 use App\Http\Requests\user\StoreUserRequest;
+use App\Http\Requests\user\UpdateUserJobRequest;
 use App\Http\Requests\user\UpdateUserPasswordRequest;
 use App\Http\Requests\user\UpdateUserProfileRequest;
 use App\Models\Session;
@@ -78,7 +79,7 @@ class UserController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('reservation.create');
+        return redirect()->route('dashboard.index');
     }
 
     /**
@@ -108,12 +109,30 @@ class UserController extends Controller
     public function update(UpdateUserProfileRequest $request, User $user): RedirectResponse
     {
         if (Gate::denies('updateProfile', $user)) {
-            return redirect()->route('reservation.create');
+            return redirect()->route('dashboard.index');
         }
 
         $user->update($request->validated());
 
         return redirect()->back()->with('message', __('Profile updated'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param UpdateUserJobRequest  $request
+     * @param User $user
+     * @return RedirectResponse
+     */
+    public function updateJob(UpdateUserJobRequest $request, User $user): RedirectResponse
+    {
+        if (Gate::denies('updateJob', $user)) {
+            return redirect()->route('dashboard.index');
+        }
+
+        $user->update($request->validated());
+
+        return redirect()->back()->with('message', __('Job data updated'));
     }
 
     /**
@@ -126,7 +145,7 @@ class UserController extends Controller
     public function updatePassword(UpdateUserPasswordRequest $request, User $user): RedirectResponse
     {
         if (Gate::denies('updatePassword', $user)) {
-            return redirect()->route('reservation.create');
+            return redirect()->route('dashboard.index');
         }
 
         if (isset($request->validated()['password_old'])) {
@@ -142,30 +161,30 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('Password updated'));
     }
 
-    /**
-     * Show reservations
-     *
-     * @param User $user
-     * @return Application|Factory|View|RedirectResponse
-     */
-    public function showReservations(User $user)
-    {
-        if (Gate::denies('showReservations', $user)) {
-            return redirect()->route('user.reservations.show', auth()->user());
-        }
-
-        $reservations = [];
-        foreach ($user->reservations as $reservation) {
-            $session = Session::find($reservation->session_id);
-            $reservations[$session->name][Carbon::parse($session->date)->format('d/m/Y H:i')][] = [
-                'id' => $reservation->id,
-                'row' => $reservation->row,
-                'column' => $reservation->column
-            ];
-        }
-
-        return view('users.reservations', compact('reservations', 'user'));
-    }
+//    /**
+//     * Show reservations
+//     *
+//     * @param User $user
+//     * @return Application|Factory|View|RedirectResponse
+//     */
+//    public function showReservations(User $user)
+//    {
+//        if (Gate::denies('showReservations', $user)) {
+//            return redirect()->route('user.reservations.show', auth()->user());
+//        }
+//
+//        $reservations = [];
+//        foreach ($user->reservations as $reservation) {
+//            $session = Session::find($reservation->session_id);
+//            $reservations[$session->name][Carbon::parse($session->date)->format('d/m/Y H:i')][] = [
+//                'id' => $reservation->id,
+//                'row' => $reservation->row,
+//                'column' => $reservation->column
+//            ];
+//        }
+//
+//        return view('users.reservations', compact('reservations', 'user'));
+//    }
 
     /**
      * Remove the specified resource from storage.
@@ -177,7 +196,7 @@ class UserController extends Controller
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if (Gate::denies('delete', $user)) {
-            return redirect()->route('reservation.create');
+            return redirect()->route('dashboard.index');
         }
 
         /** user deleting his own account */
@@ -187,7 +206,7 @@ class UserController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             $user->delete();
-            return redirect()->route('reservation.create');
+            return redirect()->route('user.login');
         }
 
         $user->delete();
@@ -214,7 +233,7 @@ class UserController extends Controller
     {
         if (Auth::attempt($request->validated())) {
             $request->session()->regenerate();
-            return redirect()->route('reservation.create');
+            return redirect()->route('dashboard.index');
         }
 
         return back()->withErrors([
@@ -235,6 +254,6 @@ class UserController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('reservation.create');
+        return redirect()->route('user.login');
     }
 }

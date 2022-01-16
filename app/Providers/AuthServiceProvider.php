@@ -2,14 +2,11 @@
 
 namespace App\Providers;
 
-use App\Models\Reservation;
-use App\Models\Session;
+use App\Models\Event;
 use App\Models\User;
-use App\Policies\ReservationPolicy;
-use App\Policies\SessionPolicy;
+use App\Policies\EventPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -20,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         User::class => UserPolicy::class,
-        Reservation::class => ReservationPolicy::class,
+        Event::class => EventPolicy::class,
     ];
 
     /**

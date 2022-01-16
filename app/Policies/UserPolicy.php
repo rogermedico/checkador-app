@@ -32,6 +32,15 @@ class UserPolicy
         return $user->id === $updatedUser->id;
     }
 
+    public function updateJob(User $user, User $updatedUser): bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return $user->id === $updatedUser->id;
+    }
+
     public function updatePassword(User $user, User $updatedUser): bool
     {
         if ($user->isAdmin()) {

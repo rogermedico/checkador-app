@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests\reservation;
+namespace App\Http\Requests\event;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProcessSecondStepReservationRequest extends FormRequest
+class StoreEventRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
@@ -21,11 +21,11 @@ class ProcessSecondStepReservationRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'seats' => 'required|array|min:1',
-            'seats.*' =>'required|string'
+            'event_datetime' => 'required|date',
+            'event_type' => 'required|exists:event_types,id',
         ];
     }
 }

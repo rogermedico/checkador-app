@@ -20,7 +20,7 @@
                             'me-3',
                             'disabled' => !$user->hasReservations()
                             ])
-                           href="{{route('user.reservations.show', $user)}}"
+                           href="{{route('user.event.show', $user)}}"
                         >
                             {{__('Edit reservations')}}
                         </a>

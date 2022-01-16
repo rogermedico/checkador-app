@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\session;
+namespace App\Http\Requests\event;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSessionRequest extends FormRequest
+class UpdateReservationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,7 @@ class UpdateSessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'date' => 'required|date|after:tomorrow',
-            'ticket_price' => 'nullable|integer|gt:0',
+            'newseat' => 'required|string',
         ];
     }
 }

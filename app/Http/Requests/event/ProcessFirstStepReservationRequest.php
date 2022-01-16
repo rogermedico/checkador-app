@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\reservation;
+namespace App\Http\Requests\event;
 
 use Illuminate\Foundation\Http\FormRequest;
 use function auth;

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests\reservation;
+namespace App\Http\Requests\user;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateReservationRequest extends FormRequest
+class UpdateUserJobRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
@@ -21,10 +21,12 @@ class UpdateReservationRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'newseat' => 'required|string',
+            'hired' => 'required|date',
+            'holidays' => 'required|min:0',
+            'personal_business_days' => 'required|min:0',
         ];
     }
 }

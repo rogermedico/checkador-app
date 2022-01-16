@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\reservation\ProcessFirstStepReservationRequest;
-use App\Http\Requests\reservation\ProcessSecondStepReservationRequest;
-use App\Http\Requests\reservation\UpdateReservationRequest;
+use App\Http\Requests\event\ProcessFirstStepReservationRequest;
+use App\Http\Requests\event\ProcessSecondStepReservationRequest;
+use App\Http\Requests\event\StoreEventRequest;
+use App\Http\Requests\event\UpdateReservationRequest;
+use App\Models\Event;
+use App\Models\EventType;
 use App\Models\Reservation;
 use App\Models\Session;
 use App\Models\User;
@@ -17,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
-class ReservationController extends Controller
+class EventController extends Controller
 {
     /**
      * Constructor, apply middleware auth to specific routes
@@ -72,120 +75,81 @@ class ReservationController extends Controller
         ]);
     }
 
-    /**
-     * Process the first step of the form for creating a new resource.
-     *
-     * @param ProcessFirstStepReservationRequest $request
-     * @return RedirectResponse
-     */
-    public function processFirstStep(ProcessFirstStepReservationRequest $request): RedirectResponse
-    {
-        session(['createReservationFirstStepInfo' => $request->validated()]);
-
-        return redirect()->route('reservation.create.second');
-    }
-
-    /**
-     * Show the second step of the form for creating a new resource.
-     *
-     * @return Application|Factory|View
-     */
-    public function createSecondStep()
-    {
-        $createReservationFirstStepInfo = session('createReservationFirstStepInfo');
-
-        $occupiedSeats = array_map(function ($seat) {
-            return $seat['row'] . '-' . $seat['column'];
-        },
-            Session::find($createReservationFirstStepInfo['session'])
-                ->reservations()
-                ->select(['row', 'column'])
-                ->get()
-                ->toArray()
-        );
-
-        if (auth()->user()) {
-            $userSeats = array_map(function ($seat) {
-                return $seat['row'] . '-' . $seat['column'];
-            },
-                Reservation::where('session_id', $createReservationFirstStepInfo['session'])
-                ->where('user_id', auth()->user()->id)
-                ->select(['row', 'column'])
-                ->get()
-                ->toArray()
-            );
-
-            $occupiedSeats = array_diff($occupiedSeats, $userSeats);
-        }
-
-        return view('reservation.create-second-step', [
-            'occupiedSeats' => $occupiedSeats,
-            'userSeats' => $userSeats ?? []
-        ]);
-    }
+//    /**
+//     * Process the first step of the form for creating a new resource.
+//     *
+//     * @param ProcessFirstStepReservationRequest $request
+//     * @return RedirectResponse
+//     */
+//    public function processFirstStep(ProcessFirstStepReservationRequest $request): RedirectResponse
+//    {
+//        session(['createReservationFirstStepInfo' => $request->validated()]);
+//
+//        return redirect()->route('reservation.create.second');
+//    }
+//
+//    /**
+//     * Show the second step of the form for creating a new resource.
+//     *
+//     * @return Application|Factory|View
+//     */
+//    public function createSecondStep()
+//    {
+//        $createReservationFirstStepInfo = session('createReservationFirstStepInfo');
+//
+//        $occupiedSeats = array_map(function ($seat) {
+//            return $seat['row'] . '-' . $seat['column'];
+//        },
+//            Session::find($createReservationFirstStepInfo['session'])
+//                ->reservations()
+//                ->select(['row', 'column'])
+//                ->get()
+//                ->toArray()
+//        );
+//
+//        if (auth()->user()) {
+//            $userSeats = array_map(function ($seat) {
+//                return $seat['row'] . '-' . $seat['column'];
+//            },
+//                Reservation::where('session_id', $createReservationFirstStepInfo['session'])
+//                ->where('user_id', auth()->user()->id)
+//                ->select(['row', 'column'])
+//                ->get()
+//                ->toArray()
+//            );
+//
+//            $occupiedSeats = array_diff($occupiedSeats, $userSeats);
+//        }
+//
+//        return view('reservation.create-second-step', [
+//            'occupiedSeats' => $occupiedSeats,
+//            'userSeats' => $userSeats ?? []
+//        ]);
+//    }
 
     /**
      * Store a newly created resource in storage (Store second step).
      *
      * @param  ProcessSecondStepReservationRequest  $request
-     * @return Application|Factory|View
+     * @return Application|Factory|View|RedirectResponse
      */
-    public function store(ProcessSecondStepReservationRequest $request)
+    public function store(StoreEventRequest $request)
     {
-        $seats = $request->validated()['seats'];
-        $createReservationFirstStepInfo = $request->session()->pull('createReservationFirstStepInfo');
-
-        if ($createReservationFirstStepInfo) {
-            if (!auth()->user()) {
-                $user = User::create([
-                    'name' => $createReservationFirstStepInfo['name'],
-                    'surname' => $createReservationFirstStepInfo['surname'],
-                    'email' => $createReservationFirstStepInfo['email'],
-                    'password' => $createReservationFirstStepInfo['password']
-                ]);
-
-                Auth::attempt([
-                    'email' => $user->email,
-                    'password' => $createReservationFirstStepInfo['password']
-                ]);
-            } else {
-                $user = auth()->user();
-            }
-
-            $session = Session::find($createReservationFirstStepInfo['session']);
-
-            foreach ($seats as $seat) {
-                $rowColumn = explode('-', $seat);
-                $reservation = Reservation::create([
-                    'user_id' => $user->id,
-                    'session_id' => $createReservationFirstStepInfo['session'],
-                    'row' => $rowColumn[0],
-                    'column' => $rowColumn[1]
-                ]);
-
-                Log::channel('reservations')
-                    ->info($user->name
-                        . ' '
-                        . $user->surname
-                        . ' (id='
-                        . $user->id
-                        . ') reserved the seat at '
-                        . $reservation->row
-                        . '-'
-                        . $reservation->column
-                        . ' for the "'
-                        . $session->name
-                        . '" theater play on '
-                        . Carbon::parse($session->date)->format('d/m/Y H:i')
-                    );
-            }
-
-            session(['message' => __('Reservation confirmed, check my reservations section to manage reservations')]);
+        if (Gate::denies('storeasdf', $validated['user_id'] ?? auth()->user()->id)) {
+            return redirect()->route('dashboard.index');
         }
 
-        return view('reservation.create', [
-            'sessions' => Session::all()
+        $validated = $request->validated();
+
+        Event::create([
+            'user_id' => $validated['user_id'] ?? auth()->user()->id,
+            'event_type_id' => $validated['event_type'],
+            'date' => Carbon::parse($validated['event_datetime'])->toDateString(),
+            'time' => Carbon::parse($validated['event_datetime'])->toTimeString(),
         ]);
+
+        return redirect()->route('dashboard.index')
+            ->with('message', __('Event created'));
     }
 
     /**

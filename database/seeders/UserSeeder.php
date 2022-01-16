@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         User::factory()->create([
             'name' => 'Roger',
             'surname' => 'Medico Piqué',
-            'email' => 'roger.medico@gmail.com',
+            'email' => 'admin@gmail.com',
             'hired' => Carbon::createFromDate(2022, 1, 4),
             'holidays' => 22,
             'personal_business_days' => 3,

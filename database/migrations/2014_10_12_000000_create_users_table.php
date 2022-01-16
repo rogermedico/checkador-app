@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,9 +19,9 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('surname');
             $table->string('email')->unique();
-            $table->date('hired');
-            $table->integer('holidays');
-            $table->integer('personal_business_days');
+            $table->date('hired')->default(Carbon::today());
+            $table->integer('holidays')->default(22);
+            $table->integer('personal_business_days')->default(3);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

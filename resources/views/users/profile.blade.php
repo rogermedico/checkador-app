@@ -61,6 +61,55 @@
                 </div>
             </form>
         </section>
+            <section class="my-3">
+                <h2>{{__('update job data')}}</h2>
+                <form class="needs-validation" novalidate method="post" action="{{route('user.update.job', $user)}}">
+                    @csrf
+                    @method('put')
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="hired">{{ __('Hired')}}</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="hired"
+                                    name="hired"
+                                    required
+                                    value="{{$user->hired}}"
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="holidays">{{ __('Holidays')}}</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    id="holidays"
+                                    placeholder="{{ __('22')}}"
+                                    name="holidays"
+                                    required
+                                    value="{{$user->holidays}}"
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="personal_business_days">{{ __('Personal business days')}}</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    id="personal_business_days"
+                                    placeholder="{{__('3')}}"
+                                    name="personal_business_days"
+                                    required
+                                    value="{{$user->personal_business_days}}"
+                                >
+                            </div>
+                        </div>
+                        <div class="me-3 mb-3 text-end">
+                            <button type="submit" class="btn btn-primary">{{ __('Update job info')}}</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
         <section class="my-3">
             <h2>{{__('update password')}}</h2>
             <form class="needs-validation" novalidate method="post" action="{{route('user.update.password', $user)}}">
