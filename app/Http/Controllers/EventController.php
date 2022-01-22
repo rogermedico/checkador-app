@@ -2,14 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\event\ProcessFirstStepReservationRequest;
-use App\Http\Requests\event\ProcessSecondStepReservationRequest;
 use App\Http\Requests\event\StoreEventRequest;
 use App\Http\Requests\event\UpdateEventRequest;
 use App\Models\Event;
-use App\Models\EventType;
-use App\Models\Reservation;
-use App\Models\Session;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -17,46 +12,63 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return Application|Factory|View|RedirectResponse
+     * @return Application|Factory|View
+     * @throws AuthorizationException
      */
-    public function index()
-    {
+    public function index(
+        int $day = null,
+        int $month = null,
+        int $year = null,
+        User $user = null
+    ) {
         $this->authorize('index', Event::class);
 
-        /**
-         * s'ha d'acabar de pensar com ha de ser aquesta pantalla
-         * en principi hi haurà un selector de dia i es mostraran
-         * tots els events del dia seleccionat amb botons per eliminar-los
-         * o editar-los.
-         */
+        $date = Carbon::createFromDate(
+            $year ?? now()->year,
+            $month ?? now()->month,
+            $day ?? now()->day,
+        );
 
-        echo 'index';
-//        if (Gate::denies('index', auth()->user())) {
-//            return redirect()->route('user.reservations.show', auth()->user());
-//        }
-//
-//        $reservations = [];
-//        foreach (Reservation::orderBy('row')->orderBy('column')->get() as $reservation) {
-//            $session = Session::find($reservation['session_id']);
-//            $user = User::find($reservation->user_id);
-//            $reservations[$session->name][Carbon::parse($session->date)->format('d/m/Y H:i')][] = [
-//                'id' => $reservation->id,
-//                'user' => $user,
-//                'row' => $reservation->row,
-//                'column' => $reservation->column,
-//            ];
-//        }
-//
-//        return view('admin.reservations', compact('reservations'));
+        $events = Event::with('eventType')
+            ->where('user_id', $user->id ?? auth()->user()->id)
+            ->where('date', $date->toDateString())
+            ->get();
+
+        $dayBefore = Event::where('user_id', $user->id ?? auth()->user()->id)
+            ->where('date', '<', $date->toDateString())
+            ->orderBy('date', 'desc')
+            ->select('date')
+            ->first()
+            ->date ?? null;
+
+        $dayBefore = $dayBefore
+            ? Carbon::create($dayBefore)
+            : null;
+
+        $dayAfter = Event::where('user_id', $user->id ?? auth()->user()->id)
+            ->where('date', '>', $date->toDateString())
+            ->orderBy('date', 'asc')
+            ->select('date')
+            ->first()
+            ->date ?? null;
+
+        $dayAfter = $dayAfter
+            ? Carbon::create($dayAfter)
+            : null;
+
+        return view('event.index', compact(
+            'date',
+            'user',
+            'events',
+            'dayBefore',
+            'dayAfter'
+        ));
     }
 
     /**
@@ -72,10 +84,11 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage (Store second step).
      *
-     * @param  ProcessSecondStepReservationRequest  $request
-     * @return Application|Factory|View|RedirectResponse
+     * @param StoreEventRequest $request
+     * @return RedirectResponse
+     * @throws AuthorizationException
      */
-    public function store(StoreEventRequest $request)
+    public function store(StoreEventRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -99,7 +112,8 @@ class EventController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param Event $event
-     * @return Application|Factory|View|RedirectResponse
+     * @return Application|Factory|View
+     * @throws AuthorizationException
      */
     public function edit(Event $event)
     {
@@ -116,10 +130,10 @@ class EventController extends Controller
      *
      * @param UpdateEventRequest $request
      * @param Event $event
-     * @return Application|Factory|View|RedirectResponse
+     * @return RedirectResponse
      * @throws AuthorizationException
      */
-    public function update(UpdateEventRequest $request, Event $event)
+    public function update(UpdateEventRequest $request, Event $event): RedirectResponse
     {
         $this->authorize('edit', $event);
 
@@ -143,6 +157,7 @@ class EventController extends Controller
      *
      * @param Event $event
      * @return RedirectResponse
+     * @throws AuthorizationException
      */
     public function destroy(Event $event): RedirectResponse
     {
