@@ -13,10 +13,10 @@
             <div class="col-4 text-center">
                 @if($dayBefore)
                     <a class="btn btn-outline-primary" href="{{route('event.index', [
+                        $user,
                         $dayBefore->day,
                         $dayBefore->month,
-                        $dayBefore->year,
-                        $user
+                        $dayBefore->year
                     ])}}">
                         <i class="far fa-calendar-minus"></i> {{__('previous day')}}
                     </a>
@@ -34,10 +34,10 @@
             <div class="col-4 text-center  fs-5">
                 @if($dayAfter)
                     <a class="btn btn-outline-primary" href="{{route('event.index', [
+                            $user,
                             $dayAfter->day,
                             $dayAfter->month,
-                            $dayAfter->year,
-                            $user
+                            $dayAfter->year
                         ])}}">
                         <i class="far fa-calendar-minus"></i> {{__('next day')}}
                     </a>
@@ -55,11 +55,17 @@
 
                         <div class="d-flex flex-row">
                             <div class="flex-grow-1 me-3">
-                                <select class="form-select" name="user_id" id="user_id" required>
+                                <select
+                                    class="form-select"
+                                    name="user_id"
+                                    id="select-user"
+                                    onchange="changeUserOnSelectChange()"
+                                    required
+                                >
                                     @foreach(\App\Models\User::all() as $u)
                                         <option
                                             value="{{$u->id}}"
-                                            {{ $user->id ?? auth()->user()->id === $u->id ? 'selected' : '' }}
+                                            {{ ($user->id ?? auth()->user()->id) === $u->id ? 'selected="selected"' : '' }}
                                         >
                                             {{ $u->name_surname }}
                                         </option>
@@ -67,10 +73,8 @@
                                 </select>
                             </div>
                             <div>
-                                <a class="btn btn-primary" href="{{route('event.index', [
-                                    $date->day,
-                                    $date->month,
-                                    $date->year,
+                                <a id="change-user" class="btn btn-primary" href="{{route('event.index', [
+                                    $user->id ?? auth()->user()->id
                                 ])}}">
                                     {{ __('Change user')}}
                                 </a>

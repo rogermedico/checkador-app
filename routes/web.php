@@ -23,7 +23,7 @@ Route::get('/', [DashboardController::class, 'index'])->middleware('auth')->name
 /** event routes */
 //Route::get('reservation/create/second', [EventController::class, 'createSecondStep'])->name('reservation.create.second');
 //Route::post('reservation/first', [EventController::class, 'processFirstStep'])->name('reservation.store.first');
-Route::get('event/all/{day?}/{month?}/{year?}/{user?}', [EventController::class, 'index'])->name('event.index');
+Route::get('event/all/{user?}/{day?}/{month?}/{year?}', [EventController::class, 'index'])->name('event.index');
 Route::resource('event', EventController::class)->middleware('auth')
     ->except('index', 'show');
 

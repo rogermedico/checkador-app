@@ -22,12 +22,14 @@ class EventController extends Controller
      * @throws AuthorizationException
      */
     public function index(
+        User $user = null,
         int $day = null,
         int $month = null,
-        int $year = null,
-        User $user = null
+        int $year = null
     ) {
         $this->authorize('index', Event::class);
+
+        $user = $user ?? auth()->user();
 
         /* no day, month and year specification, date equals last day with events */
         if (is_null($day) && is_null($month) && is_null($year)) {
