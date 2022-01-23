@@ -20,7 +20,7 @@ class EventPolicy
 
     public function index(User $user)
     {
-        return $user->isAdmin();
+        return true;//$user->isAdmin();
     }
 
     public function store(User $user, Event $event): bool

@@ -29,11 +29,26 @@ class EventController extends Controller
     ) {
         $this->authorize('index', Event::class);
 
-        $date = Carbon::createFromDate(
-            $year ?? now()->year,
-            $month ?? now()->month,
-            $day ?? now()->day,
-        );
+        /* no day, month and year specification, date equals last day with events */
+        if (is_null($day) && is_null($month) && is_null($year)) {
+            $dateOfLastEvent = Event::where('user_id', auth()->user()->id)
+                ->where('date', '<', now())
+                ->orderBy('date', 'desc')
+                ->select('date')
+                ->first()
+                ->date ?? null;
+
+            $date = $dateOfLastEvent
+                ? Carbon::create($dateOfLastEvent)
+                : now();
+        } else {
+            /* at last day specified, date set to that day even if there is no events on that date */
+            $date = Carbon::createFromDate(
+                $year ?? now()->year,
+                $month ?? now()->month,
+                $day ?? now()->day,
+            );
+        }
 
         $events = Event::with('eventType')
             ->where('user_id', $user->id ?? auth()->user()->id)

@@ -1,3 +1,3 @@
 require('./bootstrap');
-require('./contactFormValidation');
+require('./formValidation');
 require('./dismissAlerts');
