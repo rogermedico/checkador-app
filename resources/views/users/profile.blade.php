@@ -7,7 +7,7 @@
         @else
             <h1 class="serif">{{__('my profile')}}</h1>
         @endif
-        <x-messages/>
+        <x-messages :message="$message ?? null" />
         <x-errors/>
         <section class="my-3">
             <h2>{{__('update personal data')}}</h2>

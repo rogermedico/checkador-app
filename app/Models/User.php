@@ -43,6 +43,11 @@ class User extends Authenticatable
         return $this->admin;
     }
 
+    public function hasEvents()
+    {
+        return 0 !== $this->events()->count();
+    }
+
     public function setPasswordAttribute($password)
     {
         $this->attributes['password'] = Hash::make($password);

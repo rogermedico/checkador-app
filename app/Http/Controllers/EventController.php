@@ -33,7 +33,7 @@ class EventController extends Controller
 
         /* no day, month and year specification, date equals last day with events */
         if (is_null($day) && is_null($month) && is_null($year)) {
-            $dateOfLastEvent = Event::where('user_id', auth()->user()->id)
+            $dateOfLastEvent = Event::where('user_id', $user->id)
                 ->where('date', '<', now())
                 ->orderBy('date', 'desc')
                 ->select('date')
@@ -156,17 +156,20 @@ class EventController extends Controller
 
         $validated = $request->validated();
 
+        $date = Carbon::parse($validated['event_datetime']);
+
         $event->update([
             'event_type_id' => $validated['event_type'],
-            'date' => Carbon::parse($validated['event_datetime'])->toDateString(),
+            'date' => $date->toDateString(),
             'time' => Carbon::parse($validated['event_datetime'])->toTimeString(),
         ]);
 
-        if (auth()->user()->id !== $event->user_id) {
-            return redirect()->route('event.index')->with('message', __('Event updated'));
-        } else {
-            return back()->with('message', __('Event updated'));
-        }
+        return redirect()->route('event.index', [
+            $event->user_id,
+            $date->day,
+            $date->month,
+            $date->year,
+        ])->with('message', __('Event updated'));
     }
 
     /**

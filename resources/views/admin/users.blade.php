@@ -3,7 +3,7 @@
 @section('main-content')
     <div class="offset-lg-2 col-lg-8 ">
         <h1 class="serif">{{__('manage users')}}</h1>
-        <x-messages/>
+        <x-messages :message="$message ?? null" />
         <x-errors/>
         <ul class="list-group">
             @foreach($users as $user)
@@ -18,11 +18,11 @@
                             'btn',
                             'btn-outline-success',
                             'me-3',
-                            'disabled' => !$user->hasReservations()
+                            'disabled' => !$user->hasEvents()
                             ])
-                           href="{{route('user.event.show', $user)}}"
+                           href="{{route('event.index', $user)}}"
                         >
-                            {{__('Edit reservations')}}
+                            {{__('Edit events')}}
                         </a>
                         <span>
                             <form action="{{ route('user.destroy', $user) }}" method="post">

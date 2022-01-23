@@ -3,7 +3,6 @@
 @section('main-content')
     <div class="offset-lg-2 col-lg-8">
         <h1 class="serif">{{__('login')}}</h1>
-        <x-errors/>
         <form class="needs-validation" novalidate method="POST" action="{{route('user.login')}}">
             @csrf
             <div class="card mb-3">

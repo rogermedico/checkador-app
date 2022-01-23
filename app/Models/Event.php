@@ -27,6 +27,11 @@ class Event extends Model
         'event_type_id' => 'integer',
     ];
 
+    public function getTimeAttribute($time)
+    {
+        return substr($time, 0, strrpos($time, ':'));
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
