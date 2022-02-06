@@ -39,11 +39,11 @@
                             $dayAfter->month,
                             $dayAfter->year
                         ])}}">
-                        <i class="far fa-calendar-minus"></i> {{__('next day')}}
+                        <i class="far fa-calendar-plus"></i> {{__('next day')}}
                     </a>
                 @else
                     <button class="btn btn-outline-primary disabled">
-                        <i class="far fa-calendar-minus"></i> {{__('next day')}}
+                        <i class="far fa-calendar-plus"></i> {{__('next day')}}
                     </button>
                 @endif
             </div>

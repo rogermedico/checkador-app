@@ -31,78 +31,106 @@
                 </div>
             </div>
         @endif
-        <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th class="text-center" colspan="7">
-                        {{$currentMonth->monthName . ' ' . $currentMonth->year}}
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        {{__('Mon.')}}
-                    </td>
-                    <td>
-                        {{__('Tu.')}}
-                    </td>
-                    <td>
-                        {{__('Wed.')}}
-                    </td>
-                    <td>
-                        {{__('Th.')}}
-                    </td>
-                    <td>
-                        {{__('Fri.')}}
-                    </td>
-                    <td>
-                        {{__('Sat.')}}
-                    </td>
-                    <td>
-                        {{__('Sun.')}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="container">
+            <div class="row mb-3">
+                <div class="col text-start">
+                    <a class="btn btn-outline-primary" href="{{route('event.calendar', [
+                        $user,
+                        $previousMonth->month,
+                        $previousMonth->year,
+                    ])}}">
+                        <i class="far fa-calendar-minus"></i> {{__('previous month')}}
+                    </a>
+                </div>
+                <div class="col text-center fw-bold">
+                    <button class="btn btn-outline-success disabled opacity-100">
+                        <i class="far fa-calendar-check"></i> {{$currentMonth->monthName . ' ' . $currentMonth->year}}
+                    </button>
+                </div>
+                <div class="col text-end">
+                    <a class="btn btn-outline-primary" href="{{route('event.calendar', [
+                        $user,
+                        $nextMonth->month,
+                        $nextMonth->year,
+                    ])}}">
+                        <i class="far fa-calendar-plus"></i> {{__('next month')}}
+                    </a>
+                </div>
+            </div>
+            <div class="row border-bottom">
+                <div class="col text-center">
+                    {{__('Mon.')}}
+                </div>
+                <div class="col text-center">
+                    {{__('Tu.')}}
+                </div>
+                <div class="col text-center">
+                    {{__('Wed.')}}
+                </div>
+                <div class="col text-center">
+                    {{__('Th.')}}
+                </div>
+                <div class="col text-center">
+                    {{__('Fri.')}}
+                </div>
+                <div class="col text-center">
+                    {{__('Sat.')}}
+                </div>
+                <div class="col text-center">
+                    {{__('Sun.')}}
+                </div>
+            </div>
+            <div class="row">
                 {{-- previous month --}}
-                <tr>
+                @if(!$previousMonth->endOfMonth()->isSunday())
                     @for(
                         $i = \Carbon\Carbon::parse('last monday of' . $previousMonth );
                         $i <= $previousMonth->endOfMonth();
                         $i->addDay()
                     )
-                        <td class="text-muted">
+                        <div class="col text-center text-muted">
                             {{$i->day}}
-                        </td>
+                        </div>
                     @endfor
-
-                    {{-- current month --}}
-                    @for(
-                        $i = clone $currentMonth->startOfMonth();
-                        $i<= $currentMonth->endOfMonth();
-                        $i->addDay()
-                    )
-                        <td>
-                            {{$i->day}}
-                        </td>
-                        @if($i->isSunday())
-                            </tr><tr>
+                @endif
+                {{-- current month --}}
+                @for(
+                    $i = clone $currentMonth->startOfMonth();
+                    $i<= $currentMonth->endOfMonth();
+                    $i->addDay()
+                )
+                    <div class="col text-center">
+                        @if($events->contains('date', $i->toDateString()))
+                            <a href="{{route('event.index', [
+                                $user,
+                                $i->day,
+                                $i->month,
+                                $i->year,
+                            ])}}">
+                                {{$i->day}}
+                            </a>
+                        @else
+                        {{$i->day}}
                         @endif
-                    @endfor
+                    </div>
+                    @if($i->isSunday())
+                        </div><div class="row">
+                    @endif
+                @endfor
 
-                    {{-- next month --}}
+                {{-- next month --}}
+                @if(!$nextMonth->startOfMonth()->isMonday())
                     @for(
                         $i = $nextMonth->startOfMonth();
                         $i <= \Carbon\Carbon::parse('first sunday of' . $nextMonth );
                         $i->addDay()
                     )
-                        <td class="text-muted">
+                        <div class="col text-center text-muted">
                             {{$i->day}}
-                        </td>
+                        </div>
                     @endfor
-                </tr>
-            </tbody>
-        </table>
+                @endif
+            </div>
         </div>
     </div>
 </div>
