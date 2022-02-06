@@ -18,9 +18,14 @@ class EventPolicy
         }
     }
 
-    public function index(User $user)
+    public function index(User $user): bool
     {
-        return true;//$user->isAdmin();
+        return true;
+    }
+
+    public function calendar(User $user): bool
+    {
+        return true;
     }
 
     public function store(User $user, Event $event): bool

@@ -89,6 +89,48 @@ class EventController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return Application|Factory|View
+     * @throws AuthorizationException
+     */
+    public function calendar(
+        User $user = null,
+        int $month = null,
+        int $year = null
+    ) {
+        $this->authorize('calendar', Event::class);
+
+        $user = $user ?? auth()->user();
+
+        $currentMonth = Carbon::createFromDate(
+            $year ?? now()->year,
+            $month ?? now()->month,
+            1
+        );
+
+        $previousMonth = clone $currentMonth;
+        $previousMonth->subMonth();
+
+        $nextMonth = clone $currentMonth;
+        $nextMonth->addMonth();
+
+        $events = Event::with('eventType')
+            ->where('user_id', $user->id ?? auth()->user()->id)
+            ->whereMonth('date', $currentMonth->month )
+            ->whereYear('date', $currentMonth->year)
+            ->get();
+
+        return view('event.calendar', compact(
+            'user',
+            'events',
+            'currentMonth',
+            'previousMonth',
+            'nextMonth',
+        ));
+    }
+
+    /**
      * Show the form for the first step of creating a new resource.
      *
      * @return Application|Factory|View
