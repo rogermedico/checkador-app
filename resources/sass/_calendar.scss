@@ -1,0 +1,9 @@
+.calendar-cell {
+    height: 2.5rem;
+}
+
+@include media-breakpoint-up(md) {
+    .calendar-cell {
+        height: 4.5rem;
+    }
+}

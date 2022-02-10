@@ -33,27 +33,29 @@
         @endif
         <div class="container">
             <div class="row mb-3">
-                <div class="col text-start">
+                <div class="col-3 col-md-4 text-start">
                     <a class="btn btn-outline-primary" href="{{route('event.calendar', [
                         $user,
                         $previousMonth->month,
                         $previousMonth->year,
                     ])}}">
-                        <i class="far fa-calendar-minus"></i> {{__('previous month')}}
+                        <i class="far fa-calendar-minus"></i>
+                        <span class="d-none d-md-inline">{{__('previous month')}}</span>
                     </a>
                 </div>
-                <div class="col text-center fw-bold">
+                <div class="col-6 col-md-4 text-center fw-bold">
                     <button class="btn btn-outline-success disabled opacity-100">
                         <i class="far fa-calendar-check"></i> {{$currentMonth->monthName . ' ' . $currentMonth->year}}
                     </button>
                 </div>
-                <div class="col text-end">
+                <div class="col-3 col-md-4 text-end">
                     <a class="btn btn-outline-primary" href="{{route('event.calendar', [
                         $user,
                         $nextMonth->month,
                         $nextMonth->year,
                     ])}}">
-                        <i class="far fa-calendar-plus"></i> {{__('next month')}}
+                        <i class="far fa-calendar-plus"></i>
+                        <span class="d-none d-md-inline">{{__('next month')}}</span>
                     </a>
                 </div>
             </div>
@@ -88,7 +90,7 @@
                         $i <= $previousMonth->endOfMonth();
                         $i->addDay()
                     )
-                        <div class="col text-center text-muted">
+                        <div class="col d-flex justify-content-center align-items-center text-muted calendar-cell">
                             {{$i->day}}
                         </div>
                     @endfor
@@ -99,7 +101,7 @@
                     $i<= $currentMonth->endOfMonth();
                     $i->addDay()
                 )
-                    <div class="col text-center">
+                    <div class="col d-flex justify-content-center align-items-center calendar-cell">
                         @if($events->contains('date', $i->toDateString()))
                             <a href="{{route('event.index', [
                                 $user,
@@ -125,7 +127,7 @@
                         $i <= \Carbon\Carbon::parse('first sunday of' . $nextMonth );
                         $i->addDay()
                     )
-                        <div class="col text-center text-muted">
+                        <div class="col d-flex justify-content-center align-items-center text-muted calendar-cell">
                             {{$i->day}}
                         </div>
                     @endfor
