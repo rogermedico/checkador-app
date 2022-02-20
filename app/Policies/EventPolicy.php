@@ -23,9 +23,9 @@ class EventPolicy
         return true;
     }
 
-    public function calendar(User $user): bool
+    public function calendar(User $user, Event $event): bool
     {
-        return true;
+        return $user->id === $event->user_id;
     }
 
     public function store(User $user, Event $event): bool

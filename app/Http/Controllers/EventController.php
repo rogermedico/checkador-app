@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\event\StoreEventRequest;
 use App\Http\Requests\event\UpdateEventRequest;
 use App\Models\Event;
+use App\Models\EventType;
 use App\Models\User;
+use App\Services\EventService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
@@ -99,9 +101,11 @@ class EventController extends Controller
         int $month = null,
         int $year = null
     ) {
-        $this->authorize('calendar', Event::class);
-
         $user = $user ?? auth()->user();
+
+        $this->authorize('calendar', Event::make([
+            'user_id' => $user->id
+        ]));
 
         $currentMonth = Carbon::createFromDate(
             $year ?? now()->year,
@@ -121,9 +125,12 @@ class EventController extends Controller
             ->whereYear('date', $currentMonth->year)
             ->get();
 
+        $eventService = new EventService();
+        $timeSpentWorkingByDay = $eventService->TimeSpentWorkingByDay($events);
+
         return view('event.calendar', compact(
             'user',
-            'events',
+            'timeSpentWorkingByDay',
             'currentMonth',
             'previousMonth',
             'nextMonth',

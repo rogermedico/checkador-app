@@ -56,5 +56,19 @@ class EventSeeder extends Seeder
             'date' => Carbon::createFromDate(2022, 1, 9),
             'time' => Carbon::createFromTime(18, 0),
         ]);
+
+        Event::create([
+            'user_id' => 1,
+            'event_type_id' => 1,
+            'date' => Carbon::createFromDate(2022, 1, 10),
+            'time' => Carbon::createFromTime(22, 0),
+        ]);
+
+        Event::create([
+            'user_id' => 1,
+            'event_type_id' => 2,
+            'date' => Carbon::createFromDate(2022, 1, 10),
+            'time' => Carbon::createFromTime(1, 0),
+        ]);
     }
 }

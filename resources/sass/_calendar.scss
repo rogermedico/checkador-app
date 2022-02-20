@@ -7,3 +7,7 @@
         height: 4.5rem;
     }
 }
+
+.calendar-cell:hover {
+    --bs-bg-opacity: .6;
+}

@@ -10,6 +10,11 @@ class EventType extends Model
 {
     use HasFactory;
 
+    public const IN = 1;
+    public const OUT = 2;
+    public const HOLIDAY = 3;
+    public const PERSONAL_BUSINESS = 4;
+
     public $fillable = [
         'name',
     ];

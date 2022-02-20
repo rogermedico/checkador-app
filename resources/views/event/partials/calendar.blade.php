@@ -90,8 +90,10 @@
                         $i <= $previousMonth->endOfMonth();
                         $i->addDay()
                     )
-                        <div class="col d-flex justify-content-center align-items-center text-muted calendar-cell">
-                            {{$i->day}}
+                        <div class="col py-2">
+                             <div class="d-flex justify-content-center align-items-center text-muted calendar-cell">
+                                {{$i->day}}
+                            </div>
                         </div>
                     @endfor
                 @endif
@@ -101,18 +103,27 @@
                     $i<= $currentMonth->endOfMonth();
                     $i->addDay()
                 )
-                    <div class="col d-flex justify-content-center align-items-center calendar-cell">
-                        @if($events->contains('date', $i->toDateString()))
-                            <a href="{{route('event.index', [
+                    <div class="col py-2 text-primary">
+                        @if($timeSpentWorkingByDay->has($i->toDateString()))
+                            <a class="text-decoration-none" href="{{route('event.index', [
                                 $user,
                                 $i->day,
                                 $i->month,
                                 $i->year,
                             ])}}">
-                                {{$i->day}}
+                                <div @class(['d-flex', 'justify-content-center', 'align-items-center', 'calendar-cell',
+                                    'bg-danger' => $timeSpentWorkingByDay->has($i->toDateString()) && ($timeSpentWorkingByDay->get($i->toDateString()) < $user->working_time_per_day),
+                                    'bg-success' => $timeSpentWorkingByDay->has($i->toDateString()) && ($timeSpentWorkingByDay->get($i->toDateString()) >= $user->working_time_per_day),
+                                    'bg-opacity-25' => $timeSpentWorkingByDay->has($i->toDateString()),
+                                    'rounded-3' => $timeSpentWorkingByDay->has($i->toDateString()),
+                                ])>
+                                    {{$i->day}}
+                                </div>
                             </a>
                         @else
-                        {{$i->day}}
+                            <div class="d-flex justify-content-center align-items-center calendar-cell">
+                                {{$i->day}}
+                            </div>
                         @endif
                     </div>
                     @if($i->isSunday())
@@ -127,8 +138,10 @@
                         $i <= \Carbon\Carbon::parse('first sunday of' . $nextMonth );
                         $i->addDay()
                     )
-                        <div class="col d-flex justify-content-center align-items-center text-muted calendar-cell">
-                            {{$i->day}}
+                        <div class="col py-2">
+                            <div class="d-flex justify-content-center align-items-center text-muted calendar-cell">
+                                {{$i->day}}
+                            </div>
                         </div>
                     @endfor
                 @endif

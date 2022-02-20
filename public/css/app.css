@@ -17446,3 +17446,6 @@ h1, .h1 {
     height: 4.5rem;
   }
 }
+.calendar-cell:hover {
+  --bs-bg-opacity: .6;
+}

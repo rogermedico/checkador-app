@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('surname');
             $table->string('email')->unique();
             $table->date('hired')->default(Carbon::today());
+            $table->integer('working_time_per_day')->default(28800); //28800s = 8h
             $table->integer('holidays')->default(22);
             $table->integer('personal_business_days')->default(3);
             $table->timestamp('email_verified_at')->nullable();
