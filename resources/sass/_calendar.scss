@@ -8,6 +8,23 @@
     }
 }
 
+.dashboard-calendar-cell {
+    height: 2.5rem;
+}
+
+@include media-breakpoint-up(md) {
+    .dashboard-calendar-cell {
+        height: 4.5rem;
+    }
+}
+
+@include media-breakpoint-up(xl) {
+    .dashboard-calendar-cell {
+        height: 3rem;
+    }
+}
+
+
 .calendar-cell:hover {
     --bs-bg-opacity: .6;
 }

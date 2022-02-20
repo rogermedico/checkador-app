@@ -17446,6 +17446,20 @@ h1, .h1 {
     height: 4.5rem;
   }
 }
+.dashboard-calendar-cell {
+  height: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-calendar-cell {
+    height: 4.5rem;
+  }
+}
+@media (min-width: 1200px) {
+  .dashboard-calendar-cell {
+    height: 3rem;
+  }
+}
 .calendar-cell:hover {
   --bs-bg-opacity: .6;
 }
