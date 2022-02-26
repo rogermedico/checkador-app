@@ -9,6 +9,7 @@ use App\Models\EventType;
 use App\Models\User;
 use App\Services\EventService;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -134,6 +135,63 @@ class EventController extends Controller
             'currentMonth',
             'previousMonth',
             'nextMonth',
+        ));
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Application|Factory|View
+     * @throws AuthorizationException
+     */
+    public function monthInfo(
+        User $user = null,
+        int $month = null,
+        int $year = null
+    ) {
+        $user = $user ?? auth()->user();
+
+        $this->authorize('monthInfo', Event::make([
+            'user_id' => $user->id
+        ]));
+
+        $currentMonth = Carbon::createFromDate(
+            $year ?? now()->year,
+            $month ?? now()->month,
+            1
+        );
+
+        $previousMonth = clone $currentMonth;
+        $previousMonth->subMonth();
+
+        $nextMonth = clone $currentMonth;
+        $nextMonth->addMonth();
+
+        $events = Event::with('eventType')
+            ->where('user_id', $user->id ?? auth()->user()->id)
+            ->whereMonth('date', $currentMonth->month )
+            ->whereYear('date', $currentMonth->year)
+            ->get();
+
+        $eventService = new EventService();
+        $timeSpentWorkingByDay = $eventService->TimeSpentWorkingByDay($events);
+
+
+        $monthWorkingDays = (clone $currentMonth)->startOfMonth()->diffInDaysFiltered(function (Carbon $day) {
+            return $day->isWeekday();
+        }, (clone$currentMonth)->endOfMonth());
+
+        $monthWorkingTime = $user->working_time_per_day * $monthWorkingDays;
+        $monthWorkedTime = array_sum($timeSpentWorkingByDay->toArray());
+        $monthProgress = (int) ($monthWorkedTime / $monthWorkingTime * 100);
+
+        return view('event.month_info', compact(
+            'user',
+            'timeSpentWorkingByDay',
+            'currentMonth',
+            'previousMonth',
+            'nextMonth',
+            'monthProgress',
         ));
     }
 

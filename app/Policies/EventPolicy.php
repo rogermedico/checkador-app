@@ -28,6 +28,11 @@ class EventPolicy
         return $user->id === $event->user_id;
     }
 
+    public function monthInfo(User $user, Event $event): bool
+    {
+        return $user->id === $event->user_id;
+    }
+
     public function store(User $user, Event $event): bool
     {
         return $user->id === $event->user_id;

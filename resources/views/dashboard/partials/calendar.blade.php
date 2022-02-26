@@ -45,7 +45,7 @@
                     $i<= $currentMonth->endOfMonth();
                     $i->addDay()
                 )
-                    <div class="col py-2 py-xl-0 text-primary">
+                    <div class="col px-1 py-2 py-xl-0 text-primary">
                         @if($timeSpentWorkingByDay->has($i->toDateString()))
                             <a class="text-decoration-none" href="{{route('event.index', [
                                 $user,

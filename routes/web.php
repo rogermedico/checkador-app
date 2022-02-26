@@ -25,6 +25,7 @@ Route::get('/', [DashboardController::class, 'index'])->middleware('auth')->name
 //Route::post('reservation/first', [EventController::class, 'processFirstStep'])->name('reservation.store.first');
 Route::get('event/daily/{user?}/{day?}/{month?}/{year?}', [EventController::class, 'index'])->name('event.index');
 Route::get('event/calendar/{user?}/{month?}/{year?}', [EventController::class, 'calendar'])->name('event.calendar');
+Route::get('event/month/{user?}/{month?}/{year?}', [EventController::class, 'monthInfo'])->name('event.monthInfo');
 Route::resource('event', EventController::class)->middleware('auth')
     ->except('index', 'show');
 
