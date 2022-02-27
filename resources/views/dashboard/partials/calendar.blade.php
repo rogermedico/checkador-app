@@ -32,7 +32,7 @@
                         $i <= $previousMonth->endOfMonth();
                         $i->addDay()
                     )
-                        <div class="col py-2 py-xl-0">
+                        <div class="col px-1 py-2 py-xl-1">
                              <div class="d-flex justify-content-center align-items-center text-muted dashboard-calendar-cell">
                                 {{$i->day}}
                             </div>
@@ -45,7 +45,7 @@
                     $i<= $currentMonth->endOfMonth();
                     $i->addDay()
                 )
-                    <div class="col px-1 py-2 py-xl-0 text-primary">
+                    <div class="col px-1 py-2 py-xl-1 text-primary">
                         @if($timeSpentWorkingByDay->has($i->toDateString()))
                             <a class="text-decoration-none" href="{{route('event.index', [
                                 $user,
@@ -80,7 +80,7 @@
                         $i <= \Carbon\Carbon::parse('first sunday of' . $nextMonth );
                         $i->addDay()
                     )
-                        <div class="col py-2 py-xl-0">
+                        <div class="col px-1 py-2 py-xl-1">
                             <div class="d-flex justify-content-center align-items-center text-muted dashboard-calendar-cell">
                                 {{$i->day}}
                             </div>

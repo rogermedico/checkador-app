@@ -9,6 +9,7 @@ use App\Models\EventType;
 use App\Models\User;
 use App\Services\EventService;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Carbon\CarbonPeriod;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
@@ -174,16 +175,20 @@ class EventController extends Controller
             ->get();
 
         $eventService = new EventService();
-        $timeSpentWorkingByDay = $eventService->TimeSpentWorkingByDay($events);
+        $timeSpentWorkingByDay = $eventService->timeSpentWorkingByDay($events);
 
+        $monthProgress = $eventService->monthProgress($currentMonth, $events);
 
-        $monthWorkingDays = (clone $currentMonth)->startOfMonth()->diffInDaysFiltered(function (Carbon $day) {
-            return $day->isWeekday();
-        }, (clone$currentMonth)->endOfMonth());
+        $holidaysSpent = $eventService->holidaysSpent($user, $currentMonth->year);
 
-        $monthWorkingTime = $user->working_time_per_day * $monthWorkingDays;
-        $monthWorkedTime = array_sum($timeSpentWorkingByDay->toArray());
-        $monthProgress = (int) ($monthWorkedTime / $monthWorkingTime * 100);
+        $personalBusinessDaysSpent = $eventService->personalBusinessDaysSpent($user, $currentMonth->year);
+
+        $timeSpentWorkingByWeek = $eventService->timeSpentWorkingByWeek($currentMonth, $events);
+
+        CarbonInterval::setCascadeFactors([
+            'minute' => [60, 'seconds'],
+            'hour' => [60, 'minutes'],
+        ]);
 
         return view('event.month_info', compact(
             'user',
@@ -192,6 +197,9 @@ class EventController extends Controller
             'previousMonth',
             'nextMonth',
             'monthProgress',
+            'holidaysSpent',
+            'personalBusinessDaysSpent',
+            'timeSpentWorkingByWeek',
         ));
     }
 

@@ -44,9 +44,13 @@
                     </a>
                 </div>
                 <div class="col-6 col-md-4 text-center fw-bold">
-                    <button class="btn btn-outline-success disabled opacity-100">
+                    <a class="btn btn-outline-success" href="{{route('event.monthInfo', [
+                            $user,
+                        $currentMonth->month,
+                        $currentMonth->year,
+                    ])}}">
                         <i class="far fa-calendar-check"></i> {{$currentMonth->monthName . ' ' . $currentMonth->year}}
-                    </button>
+                    </a>
                 </div>
                 <div class="col-3 col-md-4 text-end">
                     <a class="btn btn-outline-primary" href="{{route('event.calendar', [
