@@ -18,9 +18,9 @@
                 </div>
             </section>
             <section class="col-xl-4 px-xl-1">
-                <h2 class="text-xl-center">{{__('actual week')}}</h2>
+                <h2 class="text-xl-center">{{__('info')}}</h2>
                 <div>
-{{--                    @include('event.partials.month_info.partials.info')--}}
+                    @include('dashboard.partials.month_info')
                 </div>
             </section>
         </div>
